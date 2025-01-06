@@ -51,3 +51,14 @@ def delete_post(id: int):
         raise HTTPException(status_code=404, detail="Post not found")
     my_posts.remove(post)
 
+@app.put("/posts/{id}")
+def update_post(id: int, post: Post):
+    old_post = fetch_posts(id)
+    if not old_post:
+        raise HTTPException(status_code=404, detail="Post not found")
+    post_index = my_posts.index(old_post)
+    post_dict = post.dict()
+    post_dict["id"] = id
+    my_posts[post_index] = post_dict
+    return {"data": post_dict}
+
