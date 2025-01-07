@@ -1,2 +1,4 @@
 # blogapi
-Web API written in Python and using MongoDB
+Web API written in Python
+
+- SQLAlchemy
