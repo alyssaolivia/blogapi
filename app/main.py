@@ -8,6 +8,8 @@ from pydantic import BaseModel
 import psycopg2
 from psycopg2.extras import RealDictCursor
 from sqlalchemy.orm import Session
+
+from app.schemas import Post
 from . import models
 from .database import engine, get_db
 
@@ -15,11 +17,6 @@ models.Base.metadata.create_all(bind=engine)
 
 # FastAPI instance
 app = FastAPI()
-
-class Post(BaseModel):
-    title: str
-    content: str
-    published: bool = True
 
 @app.get("/")
 async def root():
