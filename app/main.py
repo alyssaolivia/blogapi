@@ -8,9 +8,7 @@ from pydantic import BaseModel
 import psycopg2
 from psycopg2.extras import RealDictCursor
 from sqlalchemy.orm import Session
-
-from app.schemas import Post
-from . import models
+from . import models, schemas
 from .database import engine, get_db
 
 models.Base.metadata.create_all(bind=engine)
@@ -25,22 +23,22 @@ async def root():
 @app.get("/posts")
 def get_posts(db: Session = Depends(get_db)):
     posts = db.query(models.Post).all()
-    return {"data": posts}
+    return posts
 
 @app.post("/posts", status_code=status.HTTP_201_CREATED)
-def create_posts(post: Post, db: Session = Depends(get_db)):
+def create_posts(post: schemas.Post, db: Session = Depends(get_db)):
     new_post = models.Post(**post.dict())
     db.add(new_post)
     db.commit()
     db.refresh(new_post)
-    return {"data": new_post}   
+    return {new_post}   
 
 @app.get("/posts/{id}")
 def get_post(id: int, response: Response, db: Session = Depends(get_db)):
     post = db.query(models.Post).filter(models.Post.id == id).first()
     if not post:
         raise HTTPException(status_code=404, detail=f"Post with id {id} not found")
-    return {"post_detail": post}
+    return {post}
 
 @app.delete("/posts/{id}")
 def delete_post(id: int, db: Session = Depends(get_db)):
@@ -54,12 +52,12 @@ def delete_post(id: int, db: Session = Depends(get_db)):
     
 
 @app.put("/posts/{id}")
-def update_post(id: int, post: Post, db: Session = Depends(get_db)):
+def update_post(id: int, post: schemas.Post, db: Session = Depends(get_db)):
     query = db.query(models.Post).filter(models.Post.id == id)
     
     if not query.first():
         raise HTTPException(status_code=404, detail=f"Post with id {id} not found")
     query.update(post.dict(), synchronize_session=False)
     db.commit()
-    return {"data": query.first()}
+    return {query.first()}
 
