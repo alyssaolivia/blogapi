@@ -11,7 +11,7 @@ oauth2_scheme = OAuth2PasswordBearer(tokenUrl="login")
 
 SECRET_KEY = os.getenv("JWT_KEY")
 ALGORITHM = os.getenv("JWT_ALG")
-ACCESS_TOKEN_EXPIRE_MINUTES = os.getenv("JWT_INTERVAL")
+ACCESS_TOKEN_EXPIRE_MINUTES = int(os.getenv("JWT_INTERVAL"))
 
 def create_access_token(data: dict):
     to_encode = data.copy()
